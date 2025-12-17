@@ -1,0 +1,391 @@
+/* ==============================================
+   ACCESSIBLE - GLOBAL BOTTOM NAVIGATION
+   Persistent bottom nav replacing hamburger menu
+   
+   Structure: Home | Add | Search | Profile
+   
+   File: src/css/global-nav.css
+   Version: 1.0
+   ============================================== */
+
+:root {
+  /* Bottom nav variables - easily customizable */
+  --bottom-nav-height: 64px;
+  --bottom-nav-bg: #ffffff;
+  --bottom-nav-border: #e5e7eb;
+  --bottom-nav-text: #6b7280;
+  --bottom-nav-text-active: #4CAF50;
+  --bottom-nav-icon-size: 24px;
+  --bottom-nav-fab-size: 56px;
+  --bottom-nav-fab-bg: #4CAF50;
+  --bottom-nav-fab-color: #ffffff;
+}
+
+/* Dark mode support */
+[data-theme="dark"],
+body.dark-mode {
+  --bottom-nav-bg: #1a1a1a;
+  --bottom-nav-border: #333333;
+  --bottom-nav-text: #9ca3af;
+  --bottom-nav-text-active: #4CAF50;
+}
+
+/* ==============================================
+   BOTTOM NAVIGATION BAR
+   ============================================== */
+
+.global-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height);
+  background: var(--bottom-nav-bg);
+  border-top: 1px solid var(--bottom-nav-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: var(--z-sticky-nav, 1020);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ==============================================
+   NAV ITEMS (Home, Search, Profile)
+   ============================================== */
+
+.global-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  max-width: 80px;
+  height: 100%;
+  padding: 8px 4px;
+  background: none;
+  border: none;
+  color: var(--bottom-nav-text);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.global-nav-item:hover {
+  color: var(--bottom-nav-text-active);
+}
+
+.global-nav-item.active {
+  color: var(--bottom-nav-text-active);
+}
+
+.global-nav-item .nav-icon {
+  font-size: var(--bottom-nav-icon-size);
+  line-height: 1;
+}
+
+.global-nav-item .nav-icon svg {
+  width: var(--bottom-nav-icon-size);
+  height: var(--bottom-nav-icon-size);
+  fill: currentColor;
+}
+
+.global-nav-item .nav-label {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+/* Active indicator dot */
+.global-nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--bottom-nav-text-active);
+  border-radius: 50%;
+}
+
+/* ==============================================
+   CENTER FAB BUTTONS (Add / Search)
+   ============================================== */
+
+.global-nav-fab-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+}
+
+.global-nav-fab {
+  position: absolute;
+  bottom: 12px;
+  width: var(--bottom-nav-fab-size);
+  height: var(--bottom-nav-fab-size);
+  background: var(--bottom-nav-fab-bg);
+  color: var(--bottom-nav-fab-color);
+  border: none;
+  border-radius: 50%;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.global-nav-fab:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.5);
+}
+
+.global-nav-fab:active {
+  transform: scale(0.95);
+}
+
+.global-nav-fab svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+}
+
+/* Search FAB variant (blue) */
+.global-nav-fab.search {
+  --bottom-nav-fab-bg: #2196F3;
+  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+}
+
+.global-nav-fab.search:hover {
+  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.5);
+}
+
+/* ==============================================
+   ACTION SHEET (for Add/Search options)
+   ============================================== */
+
+.action-sheet-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 10000;
+}
+
+.action-sheet-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.action-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bottom-nav-bg);
+  border-radius: 20px 20px 0 0;
+  padding: 16px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  z-index: 10001;
+}
+
+.action-sheet-overlay.active .action-sheet {
+  transform: translateY(0);
+}
+
+.action-sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--bottom-nav-border);
+}
+
+.action-sheet-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.action-sheet-close {
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--bottom-nav-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-sheet-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-sheet-option {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--color-surface-hover, #f9fafb);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  width: 100%;
+}
+
+.action-sheet-option:hover {
+  background: var(--color-border-light, #f0f0f0);
+}
+
+.action-sheet-option:active {
+  transform: scale(0.98);
+}
+
+.action-sheet-option .option-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--bottom-nav-fab-bg);
+  color: var(--bottom-nav-fab-color);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.action-sheet-option .option-content {
+  flex: 1;
+}
+
+.action-sheet-option .option-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.action-sheet-option .option-desc {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+/* Trail option - green */
+.action-sheet-option.trail .option-icon {
+  background: #4CAF50;
+}
+
+/* Report option - orange */
+.action-sheet-option.report .option-icon {
+  background: #FF9800;
+}
+
+/* Search trails - blue */
+.action-sheet-option.search-trails .option-icon {
+  background: #2196F3;
+}
+
+/* Search reports - purple */
+.action-sheet-option.search-reports .option-icon {
+  background: #9C27B0;
+}
+
+/* ==============================================
+   PAGE CONTENT OFFSET
+   Add padding to prevent content hiding behind nav
+   ============================================== */
+
+body.has-bottom-nav {
+  padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0));
+}
+
+/* On tracker page, different handling */
+body.tracker-page.has-bottom-nav {
+  padding-bottom: 0;
+}
+
+/* ==============================================
+   HIDE TOP NAV HAMBURGER ON MOBILE
+   (Replaced by bottom nav)
+   ============================================== */
+
+@media (max-width: 768px) {
+  body.has-bottom-nav .menu-toggle {
+    display: none !important;
+  }
+  
+  body.has-bottom-nav .nav-menu {
+    display: none !important;
+  }
+  
+  /* Show only brand and auth indicator in top nav */
+  body.has-bottom-nav .top-nav {
+    justify-content: space-between;
+  }
+}
+
+/* ==============================================
+   DESKTOP: Show traditional top nav instead
+   ============================================== */
+
+@media (min-width: 769px) {
+  .global-bottom-nav {
+    display: none;
+  }
+  
+  body.has-bottom-nav {
+    padding-bottom: 0;
+  }
+}
+
+/* ==============================================
+   HIGH CONTRAST MODE
+   ============================================== */
+
+.high-contrast .global-bottom-nav {
+  border-top: 2px solid var(--color-text-primary);
+}
+
+.high-contrast .global-nav-item.active {
+  background: var(--bottom-nav-text-active);
+  color: #000000;
+}
+
+.high-contrast .global-nav-fab {
+  border: 2px solid #ffffff;
+}
+
+/* ==============================================
+   REDUCED MOTION
+   ============================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .action-sheet-overlay,
+  .action-sheet,
+  .global-nav-fab {
+    transition: none;
+  }
+}
