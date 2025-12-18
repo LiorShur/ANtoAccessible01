@@ -122,13 +122,13 @@ export class CompassController {
     this.isRotationEnabled = false;
     this.eventType = null;
     
-    // Reset rotation
+    // Reset map rotation only - compass needle stays active via tracker UI
     this.resetMapRotation();
-    this.resetCompassRotation();
+    // NOTE: Don't reset compass needle - heading display is always active
     
     this.updateToggleButton();
-    toast.show('Compass rotation disabled');
-    console.log('🧭 Compass rotation disabled');
+    toast.show('Map rotation disabled');
+    console.log('🧭 Map rotation disabled (compass still active)');
   }
 
   /**
