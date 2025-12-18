@@ -605,6 +605,7 @@ textarea:focus-visible,
     <span class="sync-icon">☁️</span>
     <span class="sync-text">Syncing...</span>
   </div>
+  
   <!-- Map Wrapper (positioned for navbar) -->
   <div id="map-wrapper">
     <!-- Map Container (rotation-friendly positioning inside wrapper) -->
@@ -613,11 +614,161 @@ textarea:focus-visible,
     </main>
   </div>
 
-  <!-- Compass (Gaia-style - small, black bg) -->
-  <div id="compass" class="tracker-compass" role="img" aria-label="Compass">
-    <div id="compass-needle" class="tracker-compass-needle"></div>
-    <div class="tracker-compass-center"></div>
-    <span class="tracker-compass-n">N</span>
+  <!-- ============================================
+       TOP CONTROL BAR: Start/Pause/Stop + Time + Distance
+       ============================================ -->
+  <div id="topControlBar" style="
+    position: fixed;
+    top: calc(var(--nav-height, 56px) + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(26, 26, 26, 0.95);
+    padding: 8px 12px;
+    border-radius: 28px;
+    z-index: 800;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+  ">
+    <!-- Start Button -->
+    <button id="startBtn" title="Start Tracking" aria-label="Start tracking" style="
+      width: 40px; height: 40px;
+      background: #4CAF50;
+      border: none; border-radius: 50%;
+      color: white; font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">▶</button>
+    
+    <!-- Pause Button -->
+    <button id="pauseBtn" title="Pause" aria-label="Pause tracking" style="
+      width: 40px; height: 40px;
+      background: #FF9800;
+      border: none; border-radius: 50%;
+      color: white; font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">⏸</button>
+    
+    <!-- Stop Button -->
+    <button id="stopBtn" title="Stop & Save" aria-label="Stop tracking" style="
+      width: 40px; height: 40px;
+      background: #f44336;
+      border: none; border-radius: 50%;
+      color: white; font-size: 16px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">⏹</button>
+    
+    <!-- Separator -->
+    <div style="width: 1px; height: 28px; background: rgba(255,255,255,0.3); margin: 0 4px;"></div>
+    
+    <!-- Timer -->
+    <div style="display: flex; flex-direction: column; align-items: center; min-width: 65px;">
+      <span id="timer" style="font-size: 16px; font-weight: 700; color: white; font-variant-numeric: tabular-nums;">00:00:00</span>
+      <span style="font-size: 9px; color: #888; text-transform: uppercase;">Time</span>
+    </div>
+    
+    <!-- Separator -->
+    <div style="width: 1px; height: 28px; background: rgba(255,255,255,0.3); margin: 0 4px;"></div>
+    
+    <!-- Distance -->
+    <div style="display: flex; flex-direction: column; align-items: center; min-width: 60px;">
+      <span id="distance" style="font-size: 16px; font-weight: 700; color: white; font-variant-numeric: tabular-nums;">0.00 km</span>
+      <span style="font-size: 9px; color: #888; text-transform: uppercase;">Dist</span>
+    </div>
+  </div>
+
+  <!-- ============================================
+       SECOND ROW: Heading + Compass + Accessibility Survey
+       ============================================ -->
+  <div id="secondRowControls" style="
+    position: fixed;
+    top: calc(var(--nav-height, 56px) + 70px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 750;
+  ">
+    <!-- Heading Display (compact) -->
+    <div id="headingDisplay" style="
+      background: rgba(26, 26, 26, 0.95);
+      padding: 4px 12px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    ">
+      <span style="font-size: 11px; color: #4CAF50; font-weight: 600;">HDG</span>
+      <span id="headingValue" style="font-size: 14px; font-weight: 700; color: white; min-width: 36px; text-align: right;">---°</span>
+    </div>
+    
+    <!-- Compass (small, round, black bg) -->
+    <div id="compass" style="
+      width: 36px; height: 36px;
+      background: #1a1a1a;
+      border: 2px solid #333;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      cursor: pointer;
+    " title="Tap 3x for debug" aria-label="Compass">
+      <div id="compass-needle" style="
+        width: 100%; height: 100%;
+        position: absolute;
+        transition: transform 0.15s ease-out;
+      ">
+        <!-- North (red triangle) -->
+        <div style="
+          position: absolute;
+          top: 4px; left: 50%;
+          transform: translateX(-50%);
+          width: 0; height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-bottom: 10px solid #f44336;
+        "></div>
+        <!-- South (white triangle) -->
+        <div style="
+          position: absolute;
+          bottom: 4px; left: 50%;
+          transform: translateX(-50%);
+          width: 0; height: 0;
+          border-left: 5px solid transparent;
+          border-right: 5px solid transparent;
+          border-top: 10px solid #ffffff;
+        "></div>
+      </div>
+      <div id="compass-center" style="
+        width: 4px; height: 4px;
+        background: #666;
+        border-radius: 50%;
+        z-index: 1;
+      "></div>
+    </div>
+    
+    <!-- Accessibility Survey Button (blue round) -->
+    <button id="accessibilitySurveyBtn" onclick="openAccessibilityForm()" title="Accessibility Survey" aria-label="Open accessibility survey" style="
+      width: 36px; height: 36px;
+      background: #2196F3;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(33, 150, 243, 0.4);
+    ">♿</button>
   </div>
 
   <!-- Compass Debug Panel (tap compass 3x to toggle) -->
@@ -675,113 +826,158 @@ textarea:focus-visible,
   <!-- Debug center marker -->
   <div id="map-center-debug" class="map-center-debug hidden"></div>
 
-  <!-- TOP INFO BAR: Heading Indicator + Compass -->
-  <div class="tracker-top-info" id="trackerTopInfo">
-    <!-- Heading Indicator (Gaia-style sliding scale) -->
-    <div id="headingIndicatorContainer" class="tracker-heading">
-      <!-- Populated by JavaScript -->
-    </div>
-  </div>
-
-  <!-- STATS DISPLAY (Time/Distance) - Positioned below top info -->
-  <div class="tracker-stats" id="trackerStats" style="position: fixed; top: calc(var(--nav-height) + 70px); left: 50%; transform: translateX(-50%); z-index: 600;">
-    <div class="tracker-stat">
-      <span id="timer" class="tracker-stat-value" aria-live="polite">00:00:00</span>
-      <span class="tracker-stat-label">Time</span>
-    </div>
-    <div class="tracker-stat">
-      <span id="distance" class="tracker-stat-value" aria-live="polite">0.00 km</span>
-      <span class="tracker-stat-label">Distance</span>
-    </div>
-  </div>
-
-  <!-- LEFT CONTROLS: Zoom, Center, Rotation -->
-  <div class="tracker-left-controls" role="toolbar" aria-label="Map controls">
-    <!-- Zoom Controls -->
-    <div class="tracker-zoom-controls">
-      <button id="zoomInBtn" class="tracker-zoom-btn" title="Zoom In" aria-label="Zoom in">+</button>
-      <button id="zoomOutBtn" class="tracker-zoom-btn" title="Zoom Out" aria-label="Zoom out">−</button>
-    </div>
+  <!-- ============================================
+       LEFT CONTROLS: Zoom, Center, Rotation
+       ============================================ -->
+  <div id="leftControls" style="
+    position: fixed;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 700;
+  ">
+    <!-- Zoom In -->
+    <button id="zoomInBtn" title="Zoom In" aria-label="Zoom in" style="
+      width: 44px; height: 44px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid #333;
+      border-radius: 10px;
+      color: white; font-size: 22px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">+</button>
+    
+    <!-- Zoom Out -->
+    <button id="zoomOutBtn" title="Zoom Out" aria-label="Zoom out" style="
+      width: 44px; height: 44px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid #333;
+      border-radius: 10px;
+      color: white; font-size: 22px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">−</button>
+    
+    <!-- Separator -->
+    <div style="height: 8px;"></div>
     
     <!-- Center to Location -->
-    <button id="centerBtn" class="tracker-btn round" title="Center on my location" aria-label="Center map on my location">
-      <span class="icon">📍</span>
-    </button>
+    <button id="centerBtn" title="Center on my location" aria-label="Center map on my location" style="
+      width: 44px; height: 44px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid #333;
+      border-radius: 50%;
+      color: white; font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">📍</button>
     
     <!-- Toggle Map Rotation -->
-    <button id="toggleBtn" class="tracker-btn round" title="Toggle Rotation" aria-label="Toggle map rotation">
-      <span class="icon">🧭</span>
-    </button>
-    
-    <!-- Fullscreen Mode -->
-    <button id="fullscreenBtn" class="tracker-btn round" title="Fullscreen" aria-label="Toggle fullscreen mode">
-      <span class="icon">⛶</span>
-    </button>
+    <button id="toggleBtn" title="Toggle Rotation" aria-label="Toggle map rotation" style="
+      width: 44px; height: 44px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid #333;
+      border-radius: 50%;
+      color: white; font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">🧭</button>
   </div>
 
-  <!-- RIGHT CONTROLS: Media + Actions -->
-  <div class="tracker-right-controls" role="toolbar" aria-label="Media and action controls">
+  <!-- ============================================
+       RIGHT CONTROLS: Media + Safety + More
+       ============================================ -->
+  <div id="rightControls" style="
+    position: fixed;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 700;
+  ">
     <!-- Take Photo -->
-    <button id="takePhotoBtn" class="tracker-btn round" title="Take Photo" aria-label="Take photo">
-      <span class="icon">📷</span>
-    </button>
+    <button id="takePhotoBtn" title="Take Photo" aria-label="Take photo" style="
+      width: 44px; height: 44px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid #333;
+      border-radius: 50%;
+      color: white; font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">📷</button>
     
     <!-- Add Note -->
-    <button id="addNoteBtn" class="tracker-btn round" onclick="addTextNote()" title="Add Note" aria-label="Add text note">
-      <span class="icon">📝</span>
-    </button>
+    <button id="addNoteBtn" onclick="addTextNote()" title="Add Note" aria-label="Add text note" style="
+      width: 44px; height: 44px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid #333;
+      border-radius: 50%;
+      color: white; font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">📝</button>
     
-    <!-- Show Route Data -->
-    <button id="showRouteBtn" class="tracker-btn round" onclick="showRouteDataOnMap()" title="Show Route Data" aria-label="Show route data on map">
-      <span class="icon">🗺</span>
-    </button>
+    <!-- Separator -->
+    <div style="height: 8px;"></div>
+    
+    <!-- Safety -->
+    <button id="safetyPanelBtn" onclick="togglePanel('safetyPanel')" title="Safety Options" aria-label="Safety options" style="
+      width: 44px; height: 44px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid #333;
+      border-radius: 50%;
+      color: white; font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">🛡️</button>
+    
+    <!-- More Options -->
+    <button id="moreOptionsBtn" onclick="togglePanel('moreOptionsPanel')" title="More Options" aria-label="More options" style="
+      width: 44px; height: 44px;
+      background: rgba(26, 26, 26, 0.95);
+      border: 1px solid #333;
+      border-radius: 50%;
+      color: white; font-size: 18px;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    ">⋯</button>
   </div>
 
-  <!-- SOS Button (Always visible) -->
-  <button id="sosBtn" class="tracker-sos-btn" onclick="safetyFeatures?.openEmergencyModal()" title="Emergency SOS" aria-label="Emergency SOS">
-    SOS
-  </button>
+  <!-- SOS Button (Always visible, bottom right) -->
+  <button id="sosBtn" onclick="safetyFeatures?.openEmergencyModal()" title="Emergency SOS" aria-label="Emergency SOS" style="
+    position: fixed;
+    bottom: 24px;
+    right: 12px;
+    width: 56px; height: 56px;
+    background: #f44336;
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+    z-index: 800;
+  ">SOS</button>
   
-  <!-- Weather Widget Container (top right) -->
-  <div id="weatherContainer" class="weather-container" style="position: fixed; top: 60px; right: 70px; z-index: 900; max-width: 200px;"></div>
-
-  <!-- BOTTOM CONTROL BAR -->
-  <div class="tracker-bottom-bar" id="trackerBottomBar">
-    <!-- Accessibility Survey Button (Prominent) -->
-    <button id="accessibilitySurveyBtn" class="tracker-survey-btn" onclick="openAccessibilityForm()" aria-label="Open accessibility survey">
-      <span class="icon">♿</span>
-      <span>Accessibility Survey</span>
-    </button>
-    
-    <!-- Main Controls Row -->
-    <div class="tracker-bottom-controls">
-      <!-- Safety Panel Toggle -->
-      <button id="safetyPanelBtn" class="tracker-btn" onclick="togglePanel('safetyPanel')" aria-label="Safety options">
-        <span class="icon">🛡️</span>
-      </button>
-      
-      <!-- START/STOP Recording Button -->
-      <button id="recordBtn" class="tracker-record-btn" aria-label="Start recording">
-        <span class="record-icon"></span>
-        <span id="recordBtnText">Start Recording</span>
-      </button>
-      
-      <!-- More Options (Export, Save, etc.) -->
-      <button id="moreOptionsBtn" class="tracker-btn" onclick="togglePanel('moreOptionsPanel')" aria-label="More options">
-        <span class="icon">⋯</span>
-      </button>
-    </div>
-  </div>
+  <!-- Weather Widget Container -->
+  <div id="weatherContainer" class="weather-container" style="position: fixed; top: 130px; right: 70px; z-index: 600; max-width: 180px;"></div>
 
   <!-- LEGACY: Keep old bottom nav hidden for compatibility -->
   <div id="bottomNav" class="bottom-nav hidden" role="navigation" aria-label="Feature panels">
-    <button class="nav-button" onclick="togglePanel('exportPanel')" aria-label="Open export panel" aria-expanded="false" aria-controls="exportPanel">Export</button>
-    <button class="nav-button" onclick="togglePanel('summaryPanel')" aria-label="Open routes panel" aria-expanded="false" aria-controls="summaryPanel">Routes</button>
-    <button class="nav-button" onclick="togglePanel('trailGuidePanel')" aria-label="Open trail guides panel" aria-expanded="false" aria-controls="trailGuidePanel">Guides</button>
-    <button class="nav-button" onclick="togglePanel('safetyPanel')" aria-label="Open safety panel" aria-expanded="false" aria-controls="safetyPanel">Safety</button>
+    <button class="nav-button" onclick="togglePanel('exportPanel')" aria-label="Open export panel">Export</button>
+    <button class="nav-button" onclick="togglePanel('summaryPanel')" aria-label="Open routes panel">Routes</button>
+    <button class="nav-button" onclick="togglePanel('trailGuidePanel')" aria-label="Open trail guides panel">Guides</button>
+    <button class="nav-button" onclick="togglePanel('safetyPanel')" aria-label="Open safety panel">Safety</button>
+  </div>
   </div>
 
-  <!-- More Options Panel (contains Export, Routes, Guides, Dev) -->
+  <!-- More Options Panel -->
   <div id="moreOptionsPanel" class="bottom-popup hidden" style="max-height: 60vh; overflow-y: auto;">
     <div style="padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
       <span style="font-weight: 600; color: #fff;">More Options</span>
@@ -802,12 +998,12 @@ textarea:focus-visible,
       <button id="loadCloudRoutesBtn" class="cloud-load-btn">☁️ Load My Routes</button>
       <button id="loadMyGuidesBtn" class="cloud-load-btn">🌐 Load My Guides</button>
       <button onclick="offlineSync?.showPendingUploadsModal()">📦 Local Storage</button>
+      <button onclick="offlineMapsUI?.openModal()">📥 Offline Maps</button>
     </div>
     
     <div style="padding: 8px; border-top: 1px solid rgba(255,255,255,0.1);">
       <div style="font-size: 11px; color: #888; padding: 4px 8px; margin-bottom: 4px;">TOOLS</div>
       <button onclick="triggerImport()">📥 Import Route</button>
-      <button onclick="offlineMapsUI?.openModal()">📥 Offline Maps</button>
       <button id="clearAllSessionsBtn">🗑️ Clear Routes</button>
     </div>
   </div>
@@ -1260,166 +1456,247 @@ textarea:focus-visible,
   })();
 
   // ============================================
-  // NEW TRACKER CONTROLS INITIALIZATION
+  // TRACKER UI CONTROLS INITIALIZATION
   // ============================================
   (function initTrackerControls() {
-    console.log('[TrackerUI] Initializing new controls...');
+    console.log('[TrackerUI] Initializing controls...');
     
     // Add tracker-page class for styling
     document.body.classList.add('tracker-page');
     
-    // ===== RECORD BUTTON STATE MANAGEMENT =====
-    const recordBtn = document.getElementById('recordBtn');
-    const recordBtnText = document.getElementById('recordBtnText');
-    let isRecording = false;
-    
-    if (recordBtn) {
-      recordBtn.addEventListener('click', () => {
-        if (!isRecording) {
-          // Start recording
-          const startBtn = document.getElementById('startBtn');
-          startBtn?.click();
-          isRecording = true;
-          recordBtn.classList.add('recording');
-          recordBtnText.textContent = 'Stop Recording';
+    // Wait for app to be ready
+    function waitForApp(callback, maxAttempts = 50) {
+      let attempts = 0;
+      const check = () => {
+        attempts++;
+        if (window.app?.controllers?.map?.map) {
+          callback();
+        } else if (attempts < maxAttempts) {
+          setTimeout(check, 100);
         } else {
-          // Stop recording
-          const stopBtn = document.getElementById('stopBtn');
-          stopBtn?.click();
-          isRecording = false;
-          recordBtn.classList.remove('recording');
-          recordBtnText.textContent = 'Start Recording';
+          console.warn('[TrackerUI] App not ready after timeout');
         }
-      });
+      };
+      check();
     }
-    
-    // Sync with existing start/stop buttons
-    document.getElementById('startBtn')?.addEventListener('click', () => {
-      isRecording = true;
-      recordBtn?.classList.add('recording');
-      if (recordBtnText) recordBtnText.textContent = 'Stop Recording';
-    });
-    
-    document.getElementById('stopBtn')?.addEventListener('click', () => {
-      isRecording = false;
-      recordBtn?.classList.remove('recording');
-      if (recordBtnText) recordBtnText.textContent = 'Start Recording';
-    });
     
     // ===== ZOOM CONTROLS =====
     document.getElementById('zoomInBtn')?.addEventListener('click', () => {
-      window.app?.controllers?.map?.map?.zoomIn();
+      const map = window.app?.controllers?.map?.map;
+      if (map) {
+        map.zoomIn();
+        console.log('[TrackerUI] Zoom in');
+      }
     });
     
     document.getElementById('zoomOutBtn')?.addEventListener('click', () => {
-      window.app?.controllers?.map?.map?.zoomOut();
+      const map = window.app?.controllers?.map?.map;
+      if (map) {
+        map.zoomOut();
+        console.log('[TrackerUI] Zoom out');
+      }
     });
     
     // ===== CENTER TO LOCATION =====
     document.getElementById('centerBtn')?.addEventListener('click', () => {
+      console.log('[TrackerUI] Center button clicked');
+      
       const mapCtrl = window.app?.controllers?.map;
       const trackingCtrl = window.app?.controllers?.tracking;
+      const map = mapCtrl?.map;
       
-      // Try to get current position
+      if (!map) {
+        console.warn('[TrackerUI] Map not available');
+        return;
+      }
+      
+      // Try to get current tracked position first
       if (trackingCtrl?.currentPosition) {
-        mapCtrl?.centerOnPosition(trackingCtrl.currentPosition);
-      } else if (navigator.geolocation) {
+        const pos = trackingCtrl.currentPosition;
+        map.setView([pos.latitude, pos.longitude], map.getZoom());
+        console.log('[TrackerUI] Centered on tracking position');
+        return;
+      }
+      
+      // Otherwise get fresh GPS position
+      if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (pos) => {
-            mapCtrl?.centerOnPosition({
-              latitude: pos.coords.latitude,
-              longitude: pos.coords.longitude
-            });
+            map.setView([pos.coords.latitude, pos.coords.longitude], map.getZoom());
+            console.log('[TrackerUI] Centered on GPS position');
           },
-          (err) => console.warn('Could not get location:', err),
-          { enableHighAccuracy: true }
+          (err) => {
+            console.warn('[TrackerUI] Geolocation error:', err.message);
+            window.toast?.warning('Could not get your location');
+          },
+          { enableHighAccuracy: true, timeout: 10000 }
         );
       }
     });
     
-    // ===== FULLSCREEN MODE =====
-    const fullscreenBtn = document.getElementById('fullscreenBtn');
-    let isFullscreen = false;
-    
-    fullscreenBtn?.addEventListener('click', () => {
-      isFullscreen = !isFullscreen;
-      document.body.classList.toggle('tracker-fullscreen', isFullscreen);
-      fullscreenBtn.querySelector('.icon').textContent = isFullscreen ? '⛶' : '⛶';
-      
-      // Invalidate map size after layout change
-      setTimeout(() => {
-        window.app?.controllers?.map?.map?.invalidateSize();
-      }, 100);
-    });
-    
-    // ===== HEADING INDICATOR =====
-    // Simple inline heading indicator (no module import needed for now)
-    const headingContainer = document.getElementById('headingIndicatorContainer');
-    if (headingContainer) {
-      // Create simple heading display
-      headingContainer.innerHTML = `
-        <div class="tracker-heading-value" id="headingValue" style="
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          font-size: 18px;
-          font-weight: 700;
-          color: #4CAF50;
-          z-index: 10;
-        ">0°</div>
-        <div style="
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          width: 2px;
-          height: 100%;
-          background: #4CAF50;
-          z-index: 5;
-        "></div>
-      `;
-      
-      // Update heading from compass controller
-      setInterval(() => {
-        const compassCtrl = window.app?.controllers?.compass;
-        if (compassCtrl && compassCtrl.isRotationEnabled) {
-          const heading = Math.round(compassCtrl.currentHeading || 0);
-          const headingValue = document.getElementById('headingValue');
-          if (headingValue) {
-            headingValue.textContent = `${heading}°`;
-          }
-        }
-      }, 100);
-    }
-    
-    // ===== COMPASS POSITION UPDATE =====
-    // Move compass to top info area
-    const compass = document.getElementById('compass');
-    const topInfo = document.getElementById('trackerTopInfo');
-    if (compass && topInfo) {
-      compass.style.position = 'relative';
-      compass.style.top = 'auto';
-      compass.style.right = 'auto';
-      topInfo.appendChild(compass);
-    }
-    
-    // ===== TOGGLE BUTTON ACTIVE STATE =====
+    // ===== TOGGLE ROTATION BUTTON =====
     const toggleBtn = document.getElementById('toggleBtn');
     if (toggleBtn) {
-      // Watch for rotation state changes
-      const originalClick = toggleBtn.onclick;
       toggleBtn.addEventListener('click', () => {
+        // The compass controller handles the actual toggle
+        // We just update the visual state
         setTimeout(() => {
           const compassCtrl = window.app?.controllers?.compass;
           if (compassCtrl?.isRotationEnabled) {
-            toggleBtn.classList.add('active');
+            toggleBtn.style.background = '#4CAF50';
+            toggleBtn.style.borderColor = '#4CAF50';
           } else {
-            toggleBtn.classList.remove('active');
+            toggleBtn.style.background = 'rgba(26, 26, 26, 0.95)';
+            toggleBtn.style.borderColor = '#333';
           }
         }, 100);
       });
     }
+    
+    // ===== HEADING DISPLAY - ALWAYS ACTIVE =====
+    // Uses device orientation directly, independent of map rotation toggle
+    let currentHeading = 0;
+    let headingEventType = null;
+    let orientationListenersActive = false;
+    
+    function handleDeviceOrientation(event) {
+      // Lock to first event type received
+      if (!headingEventType && event.alpha !== null) {
+        headingEventType = event.absolute ? 'absolute' : 'relative';
+        console.log('[HeadingDisplay] ✓ Receiving', headingEventType, 'orientation data');
+      }
+      
+      // Only process matching event type
+      const isAbsolute = event.absolute === true;
+      if (headingEventType) {
+        if ((headingEventType === 'absolute' && !isAbsolute) || 
+            (headingEventType === 'relative' && isAbsolute)) {
+          return;
+        }
+      }
+      
+      if (event.alpha !== null) {
+        // Convert alpha (counter-clockwise) to compass heading (clockwise)
+        let heading = (360 - event.alpha) % 360;
+        
+        // Adjust for screen orientation
+        const screenOrientation = window.screen?.orientation?.angle || 0;
+        heading = (heading - screenOrientation + 360) % 360;
+        
+        // Smooth the heading
+        let diff = heading - currentHeading;
+        if (diff > 180) diff -= 360;
+        if (diff < -180) diff += 360;
+        currentHeading = ((currentHeading + diff * 0.15) % 360 + 360) % 360;
+      }
+    }
+    
+    function updateHeadingDisplay() {
+      const headingEl = document.getElementById('headingValue');
+      const needleEl = document.getElementById('compass-needle');
+      const hdgLabel = document.querySelector('#headingDisplay span:first-child');
+      
+      if (headingEl) {
+        const heading = Math.round(currentHeading);
+        headingEl.textContent = `${heading}°`;
+        
+        // Color based on whether we have heading data
+        if (hdgLabel) {
+          hdgLabel.style.color = headingEventType ? '#4CAF50' : '#888';
+        }
+        
+        // Update compass needle rotation (point north)
+        if (needleEl) {
+          const needleRotation = -heading;
+          needleEl.style.transform = `rotate(${needleRotation}deg)`;
+        }
+      }
+    }
+    
+    // Add orientation listeners
+    function addOrientationListeners() {
+      if (orientationListenersActive) return;
+      
+      window.addEventListener('deviceorientationabsolute', handleDeviceOrientation, true);
+      window.addEventListener('deviceorientation', handleDeviceOrientation, true);
+      orientationListenersActive = true;
+      console.log('[HeadingDisplay] Orientation listeners added');
+    }
+    
+    // Request device orientation permission (iOS 13+)
+    function requestOrientationPermission() {
+      if (typeof DeviceOrientationEvent !== 'undefined' && 
+          typeof DeviceOrientationEvent.requestPermission === 'function') {
+        // iOS 13+ requires permission request from user gesture
+        DeviceOrientationEvent.requestPermission()
+          .then(response => {
+            if (response === 'granted') {
+              addOrientationListeners();
+              console.log('[HeadingDisplay] ✓ iOS permission granted');
+            } else {
+              console.log('[HeadingDisplay] iOS permission denied');
+            }
+          })
+          .catch(err => {
+            console.warn('[HeadingDisplay] Permission error:', err);
+            // Try adding listeners anyway for older iOS
+            addOrientationListeners();
+          });
+      } else {
+        // Non-iOS or older devices - just add listeners directly
+        addOrientationListeners();
+      }
+    }
+    
+    // Start orientation listeners immediately for non-iOS
+    if (typeof DeviceOrientationEvent === 'undefined' || 
+        typeof DeviceOrientationEvent.requestPermission !== 'function') {
+      addOrientationListeners();
+    }
+    
+    // Update display every 100ms
+    setInterval(updateHeadingDisplay, 100);
+    
+    // Request permission on first user interaction (required for iOS)
+    document.addEventListener('click', function initOrientation() {
+      requestOrientationPermission();
+      document.removeEventListener('click', initOrientation);
+    }, { once: true });
+    
+    console.log('[HeadingDisplay] ✓ Heading display initialized (always active)');
+    
+    // ===== BUTTON HOVER EFFECTS =====
+    document.querySelectorAll('#leftControls button, #rightControls button').forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        btn.style.background = 'rgba(50, 50, 50, 0.95)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        // Don't reset toggle button if active
+        if (btn.id === 'toggleBtn' && window.app?.controllers?.compass?.isRotationEnabled) {
+          btn.style.background = '#4CAF50';
+        } else {
+          btn.style.background = 'rgba(26, 26, 26, 0.95)';
+        }
+      });
+      btn.addEventListener('mousedown', () => {
+        btn.style.transform = 'scale(0.95)';
+      });
+      btn.addEventListener('mouseup', () => {
+        btn.style.transform = 'scale(1)';
+      });
+    });
+    
+    // ===== TOP CONTROL BAR BUTTON EFFECTS =====
+    document.querySelectorAll('#topControlBar button').forEach(btn => {
+      btn.addEventListener('mousedown', () => {
+        btn.style.transform = 'scale(0.9)';
+        btn.style.opacity = '0.8';
+      });
+      btn.addEventListener('mouseup', () => {
+        btn.style.transform = 'scale(1)';
+        btn.style.opacity = '1';
+      });
+    });
     
     console.log('[TrackerUI] Controls initialized!');
   })();
