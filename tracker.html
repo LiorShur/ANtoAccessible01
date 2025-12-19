@@ -1615,6 +1615,9 @@ textarea:focus-visible,
       }
     }
     
+    // Track cumulative needle rotation to avoid 360° spins at north crossing
+    let needleRotation = 0;
+    
     function updateHeadingDisplay() {
       const headingEl = document.getElementById('headingValue');
       const needleEl = document.getElementById('compass-needle-new');
@@ -1630,8 +1633,18 @@ textarea:focus-visible,
         }
         
         // Update compass needle rotation (point north)
+        // Use continuous rotation to avoid 360° spin when crossing north
         if (needleEl) {
-          const needleRotation = -heading;
+          const targetRotation = -heading;
+          
+          // Calculate shortest path to target rotation
+          let diff = targetRotation - (needleRotation % 360);
+          if (diff > 180) diff -= 360;
+          if (diff < -180) diff += 360;
+          
+          // Update cumulative rotation (allows going beyond 0-360)
+          needleRotation += diff;
+          
           needleEl.style.transform = `rotate(${needleRotation}deg)`;
         }
       }
