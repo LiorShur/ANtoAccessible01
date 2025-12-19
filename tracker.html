@@ -1282,7 +1282,7 @@ textarea:focus-visible,
     
     function getCompassController() {
       // Try multiple paths to find compass controller
-      return window.app?.controllers?.compass || 
+      return window.AccessNatureApp?.controllers?.compass || 
              window.compassController ||
              null;
     }
@@ -1457,7 +1457,7 @@ textarea:focus-visible,
       let attempts = 0;
       const check = () => {
         attempts++;
-        if (window.app?.controllers?.map?.map) {
+        if (window.AccessNatureApp?.controllers?.map?.map) {
           callback();
         } else if (attempts < maxAttempts) {
           setTimeout(check, 100);
@@ -1696,7 +1696,7 @@ textarea:focus-visible,
       });
       btn.addEventListener('mouseleave', () => {
         // Don't reset toggle button if active
-        if (btn.id === 'toggleBtn' && window.app?.controllers?.compass?.isRotationEnabled) {
+        if (btn.id === 'toggleBtn' && window.AccessNatureApp?.controllers?.compass?.isRotationEnabled) {
           btn.style.background = '#4CAF50';
         } else {
           btn.style.background = 'rgba(26, 26, 26, 0.95)';
