@@ -3,31 +3,24 @@
    Persistent bottom nav replacing hamburger menu
    
    Structure: Home | Add | Search | Profile
+   Dark theme with white SVG icons
    
    File: src/css/global-nav.css
-   Version: 1.0
+   Version: 2.0
    ============================================== */
 
 :root {
-  /* Bottom nav variables - easily customizable */
+  /* Bottom nav variables - dark theme */
   --bottom-nav-height: 64px;
-  --bottom-nav-bg: #ffffff;
-  --bottom-nav-border: #e5e7eb;
-  --bottom-nav-text: #6b7280;
-  --bottom-nav-text-active: #4CAF50;
-  --bottom-nav-icon-size: 24px;
-  --bottom-nav-fab-size: 56px;
-  --bottom-nav-fab-bg: #4CAF50;
-  --bottom-nav-fab-color: #ffffff;
-}
-
-/* Dark mode support */
-[data-theme="dark"],
-body.dark-mode {
   --bottom-nav-bg: #1a1a1a;
   --bottom-nav-border: #333333;
   --bottom-nav-text: #9ca3af;
-  --bottom-nav-text-active: #4CAF50;
+  --bottom-nav-text-active: #ffffff;
+  --bottom-nav-icon-size: 24px;
+  --bottom-nav-fab-size: 52px;
+  --bottom-nav-fab-bg: #4CAF50;
+  --bottom-nav-fab-color: #ffffff;
+  --bottom-nav-profile-signed-in: #4CAF50;
 }
 
 /* ==============================================
@@ -47,12 +40,18 @@ body.dark-mode {
   justify-content: space-around;
   padding: 0 8px;
   padding-bottom: env(safe-area-inset-bottom, 0);
-  z-index: var(--z-sticky-nav, 1020);
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1020;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+/* Hidden state for fullscreen mode */
+.global-bottom-nav.hidden {
+  transform: translateY(100%);
 }
 
 /* ==============================================
-   NAV ITEMS (Home, Search, Profile)
+   NAV ITEMS (Home, Profile)
    ============================================== */
 
 .global-nav-item {
@@ -72,6 +71,7 @@ body.dark-mode {
   cursor: pointer;
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
 }
 
 .global-nav-item:hover {
@@ -83,13 +83,16 @@ body.dark-mode {
 }
 
 .global-nav-item .nav-icon {
-  font-size: var(--bottom-nav-icon-size);
-  line-height: 1;
+  width: var(--bottom-nav-icon-size);
+  height: var(--bottom-nav-icon-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .global-nav-item .nav-icon svg {
-  width: var(--bottom-nav-icon-size);
-  height: var(--bottom-nav-icon-size);
+  width: 100%;
+  height: 100%;
   fill: currentColor;
 }
 
@@ -97,6 +100,19 @@ body.dark-mode {
   font-size: 11px;
   font-weight: 500;
   line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 70px;
+}
+
+/* Profile signed-in state */
+.global-nav-item.signed-in {
+  color: var(--bottom-nav-profile-signed-in);
+}
+
+.global-nav-item.signed-in .nav-icon svg {
+  fill: var(--bottom-nav-profile-signed-in);
 }
 
 /* Active indicator dot */
@@ -112,6 +128,10 @@ body.dark-mode {
   border-radius: 50%;
 }
 
+.global-nav-item.signed-in.active::after {
+  background: var(--bottom-nav-profile-signed-in);
+}
+
 /* ==============================================
    CENTER FAB BUTTONS (Add / Search)
    ============================================== */
@@ -121,21 +141,21 @@ body.dark-mode {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 72px;
+  width: 64px;
+  height: 100%;
 }
 
 .global-nav-fab {
   position: absolute;
-  bottom: 12px;
+  bottom: 16px;
   width: var(--bottom-nav-fab-size);
   height: var(--bottom-nav-fab-size);
-  background: var(--bottom-nav-fab-bg);
-  color: var(--bottom-nav-fab-color);
-  border: none;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #333;
   border-radius: 50%;
-  font-size: 28px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -145,7 +165,9 @@ body.dark-mode {
 
 .global-nav-fab:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 16px rgba(76, 175, 80, 0.5);
+  background: #1a1a1a;
+  border-color: #555;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
 }
 
 .global-nav-fab:active {
@@ -153,19 +175,33 @@ body.dark-mode {
 }
 
 .global-nav-fab svg {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   fill: currentColor;
 }
 
-/* Search FAB variant (blue) */
-.global-nav-fab.search {
-  --bottom-nav-fab-bg: #2196F3;
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.4);
+/* Search FAB - same style as Add */
+.global-nav-fab.search-fab {
+  background: #000000;
+  border: 2px solid #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-.global-nav-fab.search:hover {
-  box-shadow: 0 6px 16px rgba(33, 150, 243, 0.5);
+.global-nav-fab.search-fab:hover {
+  background: #1a1a1a;
+  border-color: #555;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+/* FAB labels */
+.global-nav-fab-label {
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  color: var(--bottom-nav-text);
+  white-space: nowrap;
 }
 
 /* ==============================================
@@ -178,7 +214,7 @@ body.dark-mode {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s ease;
@@ -195,7 +231,7 @@ body.dark-mode {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--bottom-nav-bg);
+  background: #1a1a1a;
   border-radius: 20px 20px 0 0;
   padding: 16px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 0));
@@ -214,13 +250,13 @@ body.dark-mode {
   align-items: center;
   margin-bottom: 16px;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--bottom-nav-border);
+  border-bottom: 1px solid #333;
 }
 
 .action-sheet-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #ffffff;
 }
 
 .action-sheet-close {
@@ -229,11 +265,15 @@ body.dark-mode {
   background: none;
   border: none;
   font-size: 24px;
-  color: var(--bottom-nav-text);
+  color: #9ca3af;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.action-sheet-close:hover {
+  color: #ffffff;
 }
 
 .action-sheet-options {
@@ -247,7 +287,7 @@ body.dark-mode {
   align-items: center;
   gap: 16px;
   padding: 16px;
-  background: var(--color-surface-hover, #f9fafb);
+  background: #2a2a2a;
   border: none;
   border-radius: 12px;
   cursor: pointer;
@@ -257,7 +297,7 @@ body.dark-mode {
 }
 
 .action-sheet-option:hover {
-  background: var(--color-border-light, #f0f0f0);
+  background: #333333;
 }
 
 .action-sheet-option:active {
@@ -268,13 +308,18 @@ body.dark-mode {
   width: 48px;
   height: 48px;
   background: var(--bottom-nav-fab-bg);
-  color: var(--bottom-nav-fab-color);
+  color: #ffffff;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
   flex-shrink: 0;
+}
+
+.action-sheet-option .option-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
 }
 
 .action-sheet-option .option-content {
@@ -284,13 +329,13 @@ body.dark-mode {
 .action-sheet-option .option-title {
   font-size: 16px;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #ffffff;
   margin-bottom: 4px;
 }
 
 .action-sheet-option .option-desc {
   font-size: 13px;
-  color: var(--color-text-secondary);
+  color: #9ca3af;
 }
 
 /* Trail option - green */
@@ -322,9 +367,20 @@ body.has-bottom-nav {
   padding-bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0));
 }
 
-/* On tracker page, different handling */
+/* On tracker page, different handling - map fills screen */
 body.tracker-page.has-bottom-nav {
   padding-bottom: 0;
+}
+
+/* Adjust floating elements above bottom nav */
+body.has-bottom-nav .sos-button,
+body.has-bottom-nav #sosButton {
+  bottom: calc(var(--bottom-nav-height) + 16px + env(safe-area-inset-bottom, 0)) !important;
+}
+
+body.has-bottom-nav .beta-feedback-btn,
+body.has-bottom-nav #betaFeedbackBtn {
+  bottom: calc(var(--bottom-nav-height) + 80px + env(safe-area-inset-bottom, 0)) !important;
 }
 
 /* ==============================================
@@ -341,9 +397,14 @@ body.tracker-page.has-bottom-nav {
     display: none !important;
   }
   
-  /* Show only brand and auth indicator in top nav */
+  /* Keep brand visible in top nav */
   body.has-bottom-nav .top-nav {
-    justify-content: space-between;
+    justify-content: center;
+  }
+  
+  /* Hide auth indicator in top nav (now in bottom nav profile) */
+  body.has-bottom-nav .auth-status {
+    display: none !important;
   }
 }
 
@@ -366,11 +427,11 @@ body.tracker-page.has-bottom-nav {
    ============================================== */
 
 .high-contrast .global-bottom-nav {
-  border-top: 2px solid var(--color-text-primary);
+  border-top: 2px solid #ffffff;
 }
 
 .high-contrast .global-nav-item.active {
-  background: var(--bottom-nav-text-active);
+  background: #ffffff;
   color: #000000;
 }
 
@@ -385,7 +446,8 @@ body.tracker-page.has-bottom-nav {
 @media (prefers-reduced-motion: reduce) {
   .action-sheet-overlay,
   .action-sheet,
-  .global-nav-fab {
+  .global-nav-fab,
+  .global-bottom-nav {
     transition: none;
   }
 }
