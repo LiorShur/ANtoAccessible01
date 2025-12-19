@@ -721,37 +721,38 @@ textarea:focus-visible,
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
       cursor: pointer;
     " title="Tap 3x for debug" aria-label="Compass">
-      <div id="compass-needle" style="
+      <!-- Custom needle container (different ID to avoid CSS conflicts) -->
+      <div id="compass-needle-new" style="
         width: 100%; height: 100%;
         position: absolute;
         transition: transform 0.15s ease-out;
       ">
-        <!-- North (red triangle) -->
+        <!-- North (red triangle pointing up) -->
         <div style="
           position: absolute;
-          top: 4px; left: 50%;
+          top: 5px; left: 50%;
           transform: translateX(-50%);
           width: 0; height: 0;
-          border-left: 5px solid transparent;
-          border-right: 5px solid transparent;
-          border-bottom: 10px solid #f44336;
+          border-left: 4px solid transparent;
+          border-right: 4px solid transparent;
+          border-bottom: 12px solid #f44336;
         "></div>
-        <!-- South (white triangle) -->
+        <!-- South (white triangle pointing down) -->
         <div style="
           position: absolute;
-          bottom: 4px; left: 50%;
+          bottom: 5px; left: 50%;
           transform: translateX(-50%);
           width: 0; height: 0;
-          border-left: 5px solid transparent;
-          border-right: 5px solid transparent;
-          border-top: 10px solid #ffffff;
+          border-left: 4px solid transparent;
+          border-right: 4px solid transparent;
+          border-top: 12px solid #ffffff;
         "></div>
       </div>
       <div id="compass-center" style="
         width: 4px; height: 4px;
         background: #666;
         border-radius: 50%;
-        z-index: 1;
+        z-index: 2;
       "></div>
     </div>
     
@@ -948,25 +949,12 @@ textarea:focus-visible,
     ">⋯</button>
   </div>
 
-  <!-- SOS Button (Always visible, bottom right) -->
-  <button id="sosBtn" onclick="safetyFeatures?.openEmergencyModal()" title="Emergency SOS" aria-label="Emergency SOS" style="
-    position: fixed;
-    bottom: 24px;
-    right: 12px;
-    width: 56px; height: 56px;
-    background: #f44336;
-    border: none;
-    border-radius: 50%;
-    color: white;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
-    z-index: 800;
-  ">SOS</button>
-  
   <!-- Weather Widget Container -->
   <div id="weatherContainer" class="weather-container" style="position: fixed; top: 130px; right: 70px; z-index: 600; max-width: 180px;"></div>
+
+  <!-- NOTE: SOS button is created dynamically by safetyFeatures.js -->
+  <!-- NOTE: Beta feedback button is created dynamically by betaFeedback.js -->
+  <!-- Both will need repositioning when bottom nav is added -->
 
   <!-- LEGACY: Keep old bottom nav hidden for compatibility -->
   <div id="bottomNav" class="bottom-nav hidden" role="navigation" aria-label="Feature panels">
@@ -1593,7 +1581,7 @@ textarea:focus-visible,
     
     function updateHeadingDisplay() {
       const headingEl = document.getElementById('headingValue');
-      const needleEl = document.getElementById('compass-needle');
+      const needleEl = document.getElementById('compass-needle-new');
       const hdgLabel = document.querySelector('#headingDisplay span:first-child');
       
       if (headingEl) {
