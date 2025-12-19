@@ -788,6 +788,9 @@
     }
   </style>
   
+  <!-- Global Bottom Navigation -->
+  <link rel="stylesheet" href="src/css/global-nav.css">
+  
   <!-- Analytics & Error Monitoring -->
   <script src="src/utils/monitoring.js" defer></script>
 </head>
@@ -4349,6 +4352,35 @@ Generated: ${new Date().toLocaleString()}`;
         btn.querySelector('.btn-text').textContent = 'Create Account';
       }
     });
+  </script>
+  
+  <!-- Global Bottom Navigation -->
+  <script type="module">
+    import { initGlobalNav } from './src/components/globalNav.js';
+    
+    // Initialize bottom nav
+    initGlobalNav({ currentPage: 'reports' });
+    
+    // Expose openAuthModal for bottom nav
+    window.openAuthModal = () => {
+      const authModal = document.getElementById('authModal');
+      if (authModal) {
+        authModal.classList.remove('hidden');
+      }
+    };
+    
+    // Expose function for action sheet to open report modal
+    window.openReportModal = () => {
+      const createBtn = document.querySelector('[data-action="create-report"]') || 
+                       document.getElementById('createReportBtn');
+      if (createBtn) createBtn.click();
+    };
+    
+    // Handle URL action parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('action') === 'create') {
+      setTimeout(() => window.openReportModal?.(), 500);
+    }
   </script>
 </body>
 </html>
