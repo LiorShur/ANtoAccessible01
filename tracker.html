@@ -1470,18 +1470,22 @@ textarea:focus-visible,
     
     // ===== ZOOM CONTROLS =====
     document.getElementById('zoomInBtn')?.addEventListener('click', () => {
-      const map = window.app?.controllers?.map?.map;
+      const map = window.AccessNatureApp?.controllers?.map?.map;
       if (map) {
         map.zoomIn();
         console.log('[TrackerUI] Zoom in');
+      } else {
+        console.warn('[TrackerUI] Map not ready for zoom');
       }
     });
     
     document.getElementById('zoomOutBtn')?.addEventListener('click', () => {
-      const map = window.app?.controllers?.map?.map;
+      const map = window.AccessNatureApp?.controllers?.map?.map;
       if (map) {
         map.zoomOut();
         console.log('[TrackerUI] Zoom out');
+      } else {
+        console.warn('[TrackerUI] Map not ready for zoom');
       }
     });
     
@@ -1489,12 +1493,13 @@ textarea:focus-visible,
     document.getElementById('centerBtn')?.addEventListener('click', () => {
       console.log('[TrackerUI] Center button clicked');
       
-      const mapCtrl = window.app?.controllers?.map;
-      const trackingCtrl = window.app?.controllers?.tracking;
+      const mapCtrl = window.AccessNatureApp?.controllers?.map;
+      const trackingCtrl = window.AccessNatureApp?.controllers?.tracking;
       const map = mapCtrl?.map;
       
       if (!map) {
-        console.warn('[TrackerUI] Map not available');
+        console.warn('[TrackerUI] Map not available yet');
+        window.toast?.warning('Map still loading...');
         return;
       }
       
@@ -1508,17 +1513,21 @@ textarea:focus-visible,
       
       // Otherwise get fresh GPS position
       if (navigator.geolocation) {
+        window.toast?.show('Getting your location...');
         navigator.geolocation.getCurrentPosition(
           (pos) => {
             map.setView([pos.coords.latitude, pos.coords.longitude], map.getZoom());
-            console.log('[TrackerUI] Centered on GPS position');
+            console.log('[TrackerUI] Centered on GPS position:', pos.coords.latitude, pos.coords.longitude);
+            window.toast?.success('Centered on your location');
           },
           (err) => {
             console.warn('[TrackerUI] Geolocation error:', err.message);
-            window.toast?.warning('Could not get your location');
+            window.toast?.warning('Could not get your location: ' + err.message);
           },
           { enableHighAccuracy: true, timeout: 10000 }
         );
+      } else {
+        window.toast?.error('Geolocation not supported');
       }
     });
     
@@ -1529,7 +1538,7 @@ textarea:focus-visible,
         // The compass controller handles the actual toggle
         // We just update the visual state
         setTimeout(() => {
-          const compassCtrl = window.app?.controllers?.compass;
+          const compassCtrl = window.AccessNatureApp?.controllers?.compass;
           if (compassCtrl?.isRotationEnabled) {
             toggleBtn.style.background = '#4CAF50';
             toggleBtn.style.borderColor = '#4CAF50';
@@ -1546,6 +1555,10 @@ textarea:focus-visible,
     let currentHeading = 0;
     let headingEventType = null;
     let orientationListenersActive = false;
+    
+    // Some Android devices (especially Xiaomi) have a known 45-degree offset
+    // This can be adjusted here if needed
+    const HEADING_OFFSET_CORRECTION = 0; // Set to 45 or -45 if needed
     
     function handleDeviceOrientation(event) {
       // Lock to first event type received
@@ -1585,6 +1598,11 @@ textarea:focus-visible,
         
         if (screenAngle !== 0) {
           heading = (heading - screenAngle + 360) % 360;
+        }
+        
+        // Apply device-specific correction if needed
+        if (HEADING_OFFSET_CORRECTION !== 0) {
+          heading = (heading + HEADING_OFFSET_CORRECTION + 360) % 360;
         }
       }
       
