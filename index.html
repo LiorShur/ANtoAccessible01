@@ -187,6 +187,7 @@
   <link rel="stylesheet" href="src/css/pwa.css">
   <link rel="stylesheet" href="src/css/unified-nav.css">
   <link rel="stylesheet" href="src/css/mobile-responsive.css">
+  <link rel="stylesheet" href="src/css/global-nav.css">
   <link rel="stylesheet" href="src/css/error-messages.css">
 
   <!-- CRITICAL: Apply saved preferences immediately to prevent flash -->
@@ -879,6 +880,9 @@ async function makeGuidesPublic() {
     document.getElementById('authModal')?.classList.remove('hidden');
   }
   
+  // Expose globally for bottom nav
+  window.openAuthModal = openAuthModal;
+  
   // Login form handler
   document.getElementById('loginFormElement')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -959,6 +963,34 @@ async function makeGuidesPublic() {
       }
     }
   });
+</script>
+
+<!-- Global Bottom Navigation -->
+<script type="module">
+  import { initGlobalNav } from './src/components/globalNav.js';
+  
+  // Initialize bottom nav
+  initGlobalNav({ currentPage: 'home' });
+  
+  // Handle URL parameters
+  const urlParams = new URLSearchParams(window.location.search);
+  const action = urlParams.get('action');
+  const signin = urlParams.get('signin');
+  
+  // Clear URL params after reading
+  if (action || signin) {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+  
+  // Handle signin request
+  if (signin === 'true') {
+    setTimeout(() => window.openAuthModal?.(), 500);
+  }
+  
+  // Handle search-trails action
+  if (action === 'search-trails') {
+    setTimeout(() => window.openTrailBrowser?.(), 1000);
+  }
 </script>
 </body>
 </html>
