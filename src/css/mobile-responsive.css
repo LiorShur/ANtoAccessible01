@@ -405,12 +405,10 @@ html {
     border-radius: 16px 16px 0 0 !important;
   }
   
-  /* Compass */
+  /* Compass - keep at 36x36 */
   #compass {
-    width: 50px !important;
-    height: 50px !important;
-    bottom: 70px !important;
-    right: 8px !important;
+    width: 36px !important;
+    height: 36px !important;
   }
   
   /* Weather widget */
