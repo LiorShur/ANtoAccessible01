@@ -15,13 +15,14 @@
    COMPASS
    ============================================== */
 
-.compass-container,
-#compass {
+.compass-container {
   position: fixed;
   top: calc(var(--nav-height) + var(--space-md));
   right: var(--space-md);
   z-index: var(--z-compass);
 }
+
+/* #compass positioning now handled inline in tracker.html */
 
 .compass {
   width: 60px;
@@ -425,8 +426,7 @@
    ============================================== */
 
 @media (max-width: 640px) {
-  .compass-container,
-  #compass {
+  .compass-container {
     top: calc(var(--nav-height) + var(--space-sm));
     right: var(--space-sm);
   }
@@ -487,8 +487,7 @@
 
 /* Landscape adjustments */
 @media (max-height: 500px) and (orientation: landscape) {
-  .compass-container,
-  #compass {
+  .compass-container {
     top: calc(48px + var(--space-sm));
   }
 

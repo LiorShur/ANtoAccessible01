@@ -76,12 +76,7 @@ body.dark-mode .modal-container {
     right: 5px;
   }
   
-  #compass {
-    top: 10px;
-    right: 10px;
-    width: 40px;
-    height: 40px;
-  }
+  /* #compass positioning now handled inline in tracker.html */
   
   .round-button {
     width: 38px;
