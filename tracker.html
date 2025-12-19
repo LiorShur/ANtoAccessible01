@@ -440,7 +440,7 @@ textarea:focus-visible,
 <!-- Analytics & Error Monitoring -->
 <script src="src/utils/monitoring.js" defer></script>
 </head>
-<body>
+<body class="tracker-page">
   <!-- Skip to main content link for keyboard users -->
   <a href="#map-container" class="skip-link">Skip to map</a>
   
@@ -973,6 +973,11 @@ textarea:focus-visible,
     </div>
     
     <div style="padding: 8px;">
+      <div style="font-size: 11px; color: #888; padding: 4px 8px; margin-bottom: 4px;">VIEW</div>
+      <button id="fullscreenToggleBtn" onclick="toggleFullscreenMode()">⛶ Toggle Fullscreen</button>
+    </div>
+    
+    <div style="padding: 8px; border-top: 1px solid rgba(255,255,255,0.1);">
       <div style="font-size: 11px; color: #888; padding: 4px 8px; margin-bottom: 4px;">SAVE & EXPORT</div>
       <button id="saveToCloudBtn" class="cloud-save-btn">☁️ Save to Cloud</button>
       <button id="prepareAndExportBtn">📦 Export Route</button>
@@ -1133,6 +1138,23 @@ textarea:focus-visible,
   <script type="module" src="src/features/offlineSync.js"></script>
   <script type="module" src="src/pwa/pwaManager.js"></script>
   <script type="module" src="src/pwa/offlineMapsUI.js"></script>
+  
+  <!-- Global Bottom Navigation -->
+  <script type="module">
+    import { initGlobalNav } from './src/components/globalNav.js';
+    
+    // Initialize bottom nav
+    const globalNav = initGlobalNav({ currentPage: 'tracker' });
+    
+    // Expose toggle function for fullscreen button
+    window.toggleBottomNav = () => {
+      globalNav.toggle();
+      // Dispatch event for other components
+      window.dispatchEvent(new CustomEvent('fullscreenToggle', { 
+        detail: { fullscreen: globalNav.isHidden }
+      }));
+    };
+  </script>
 
   <script type="module">
   // Check if redirected for sign-in
@@ -1148,6 +1170,14 @@ textarea:focus-visible,
       }
     }, 500);
   }
+  
+  // Expose openAuthModal globally for bottom nav
+  window.openAuthModal = () => {
+    const authModal = document.getElementById('authModal');
+    if (authModal) {
+      authModal.classList.remove('hidden');
+    }
+  };
   
   // Auth setup (hamburger menu is handled in IMMEDIATE UI Handlers above)
   try {
@@ -1731,6 +1761,96 @@ textarea:focus-visible,
     
     console.log('[TrackerUI] Controls initialized!');
   })();
+  
+  // ===== FULLSCREEN MODE TOGGLE =====
+  let isFullscreen = false;
+  
+  function toggleFullscreenMode() {
+    isFullscreen = !isFullscreen;
+    
+    const topControlBar = document.getElementById('topControlBar');
+    const headingRow = document.getElementById('headingRow');
+    const leftControls = document.getElementById('leftControls');
+    const rightControls = document.getElementById('rightControls');
+    const bottomNav = document.getElementById('globalBottomNav');
+    const fullscreenBtn = document.getElementById('fullscreenToggleBtn');
+    
+    // Get or create exit fullscreen button
+    let exitBtn = document.getElementById('exitFullscreenBtn');
+    
+    if (isFullscreen) {
+      // Enter fullscreen - hide all UI except map
+      topControlBar?.style.setProperty('display', 'none', 'important');
+      headingRow?.style.setProperty('display', 'none', 'important');
+      leftControls?.style.setProperty('display', 'none', 'important');
+      rightControls?.style.setProperty('display', 'none', 'important');
+      bottomNav?.classList.add('hidden');
+      
+      if (fullscreenBtn) fullscreenBtn.textContent = '⛶ Exit Fullscreen';
+      
+      // Create exit button if doesn't exist
+      if (!exitBtn) {
+        exitBtn = document.createElement('button');
+        exitBtn.id = 'exitFullscreenBtn';
+        exitBtn.innerHTML = '⛶';
+        exitBtn.title = 'Exit Fullscreen';
+        exitBtn.setAttribute('aria-label', 'Exit fullscreen mode');
+        exitBtn.style.cssText = `
+          position: fixed;
+          top: 60px;
+          right: 10px;
+          width: 40px;
+          height: 40px;
+          background: rgba(26, 26, 26, 0.8);
+          border: 1px solid #444;
+          border-radius: 50%;
+          color: white;
+          font-size: 18px;
+          cursor: pointer;
+          z-index: 9999;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          opacity: 0.6;
+          transition: opacity 0.2s;
+        `;
+        exitBtn.addEventListener('mouseenter', () => exitBtn.style.opacity = '1');
+        exitBtn.addEventListener('mouseleave', () => exitBtn.style.opacity = '0.6');
+        exitBtn.addEventListener('click', toggleFullscreenMode);
+        document.body.appendChild(exitBtn);
+      }
+      exitBtn.style.display = 'flex';
+      
+      // Show a brief toast
+      window.toast?.show('Fullscreen mode');
+      
+      // Close the options panel
+      togglePanel('moreOptionsPanel');
+      
+    } else {
+      // Exit fullscreen - show all UI
+      topControlBar?.style.removeProperty('display');
+      headingRow?.style.removeProperty('display');
+      leftControls?.style.removeProperty('display');
+      rightControls?.style.removeProperty('display');
+      bottomNav?.classList.remove('hidden');
+      
+      if (fullscreenBtn) fullscreenBtn.textContent = '⛶ Toggle Fullscreen';
+      
+      // Hide exit button
+      if (exitBtn) exitBtn.style.display = 'none';
+    }
+    
+    // Dispatch event for other components
+    window.dispatchEvent(new CustomEvent('fullscreenToggle', { 
+      detail: { fullscreen: isFullscreen }
+    }));
+    
+    console.log('[TrackerUI] Fullscreen mode:', isFullscreen);
+  }
+  
+  // Make function globally available
+  window.toggleFullscreenMode = toggleFullscreenMode;
 </script>
 </body>
 </html>
