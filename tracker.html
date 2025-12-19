@@ -694,66 +694,66 @@ textarea:focus-visible,
     gap: 8px;
     z-index: 750;
   ">
-    <!-- Heading Display (compact) -->
+    <!-- Combined Heading Display with Compass -->
     <div id="headingDisplay" style="
       background: rgba(26, 26, 26, 0.95);
-      padding: 4px 12px;
-      border-radius: 16px;
+      padding: 4px 8px 4px 4px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     ">
-      <span style="font-size: 11px; color: #4CAF50; font-weight: 600;">HDG</span>
-      <span id="headingValue" style="font-size: 14px; font-weight: 700; color: white; min-width: 36px; text-align: right;">---°</span>
-    </div>
-    
-    <!-- Compass (small, round, black bg) -->
-    <div id="compass" style="
-      width: 36px; height: 36px;
-      background: #1a1a1a;
-      border: 2px solid #333;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-      cursor: pointer;
-    " title="Tap 3x for debug" aria-label="Compass">
-      <!-- Custom needle container (different ID to avoid CSS conflicts) -->
-      <div id="compass-needle-new" style="
-        width: 100%; height: 100%;
-        position: absolute;
-        transition: transform 0.15s ease-out;
-      ">
-        <!-- North (red triangle pointing up) -->
-        <div style="
+      <!-- Compass (inside heading display) -->
+      <div id="compass" style="
+        width: 36px; height: 36px;
+        background: #1a1a1a;
+        border: 2px solid #333;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: pointer;
+        flex-shrink: 0;
+      " title="Tap 3x for debug" aria-label="Compass">
+        <!-- Custom needle container (different ID to avoid CSS conflicts) -->
+        <div id="compass-needle-new" style="
+          width: 100%; height: 100%;
           position: absolute;
-          top: 5px; left: 50%;
-          transform: translateX(-50%);
-          width: 0; height: 0;
-          border-left: 4px solid transparent;
-          border-right: 4px solid transparent;
-          border-bottom: 12px solid #f44336;
-        "></div>
-        <!-- South (white triangle pointing down) -->
-        <div style="
-          position: absolute;
-          bottom: 5px; left: 50%;
-          transform: translateX(-50%);
-          width: 0; height: 0;
-          border-left: 4px solid transparent;
-          border-right: 4px solid transparent;
-          border-top: 12px solid #ffffff;
+          transition: transform 0.15s ease-out;
+        ">
+          <!-- North (red triangle pointing up) -->
+          <div style="
+            position: absolute;
+            top: 5px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: 12px solid #f44336;
+          "></div>
+          <!-- South (white triangle pointing down) -->
+          <div style="
+            position: absolute;
+            bottom: 5px; left: 50%;
+            transform: translateX(-50%);
+            width: 0; height: 0;
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 12px solid #ffffff;
+          "></div>
+        </div>
+        <div id="compass-center" style="
+          width: 4px; height: 4px;
+          background: #666;
+          border-radius: 50%;
+          z-index: 2;
         "></div>
       </div>
-      <div id="compass-center" style="
-        width: 4px; height: 4px;
-        background: #666;
-        border-radius: 50%;
-        z-index: 2;
-      "></div>
+      
+      <!-- Heading value -->
+      <span id="headingValue" style="font-size: 16px; font-weight: 700; color: white; min-width: 42px; text-align: right;">---°</span>
     </div>
     
     <!-- Accessibility Survey Button (blue round) -->
@@ -1621,16 +1621,10 @@ textarea:focus-visible,
     function updateHeadingDisplay() {
       const headingEl = document.getElementById('headingValue');
       const needleEl = document.getElementById('compass-needle-new');
-      const hdgLabel = document.querySelector('#headingDisplay span:first-child');
       
       if (headingEl) {
         const heading = Math.round(currentHeading);
         headingEl.textContent = `${heading}°`;
-        
-        // Color based on whether we have heading data
-        if (hdgLabel) {
-          hdgLabel.style.color = headingEventType ? '#4CAF50' : '#888';
-        }
         
         // Update compass needle rotation (point north)
         // Use continuous rotation to avoid 360° spin when crossing north
