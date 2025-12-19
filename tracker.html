@@ -1549,28 +1549,46 @@ textarea:focus-visible,
     
     function handleDeviceOrientation(event) {
       // Lock to first event type received
-      if (!headingEventType && event.alpha !== null) {
+      if (!headingEventType && (event.alpha !== null || event.webkitCompassHeading !== undefined)) {
         headingEventType = event.absolute ? 'absolute' : 'relative';
-        console.log('[HeadingDisplay] ✓ Receiving', headingEventType, 'orientation data');
+        const hasWebkit = typeof event.webkitCompassHeading !== 'undefined';
+        console.log('[HeadingDisplay] ✓ Source:', hasWebkit ? 'webkitCompassHeading (iOS)' : 'alpha (Android)', '| Type:', headingEventType);
       }
       
-      // Only process matching event type
-      const isAbsolute = event.absolute === true;
-      if (headingEventType) {
-        if ((headingEventType === 'absolute' && !isAbsolute) || 
-            (headingEventType === 'relative' && isAbsolute)) {
-          return;
+      // Only process matching event type (prefer absolute)
+      const isAbsolute = event.absolute === true || event.type === 'deviceorientationabsolute';
+      if (headingEventType === 'absolute' && !isAbsolute) {
+        return; // Ignore relative events if we have absolute
+      }
+      
+      let heading = null;
+      
+      // iOS Safari: webkitCompassHeading gives direct compass heading
+      // Already follows convention: 0=N, 90=E, 180=S, 270=W, increases clockwise
+      if (typeof event.webkitCompassHeading !== 'undefined' && event.webkitCompassHeading !== null) {
+        heading = event.webkitCompassHeading;
+      }
+      // Android/Other: Use alpha value
+      else if (event.alpha !== null && event.alpha !== undefined) {
+        // Convert alpha (counter-clockwise) to compass heading (clockwise)
+        heading = (360 - event.alpha) % 360;
+        
+        // Adjust for screen orientation (landscape/portrait)
+        // window.orientation is deprecated but still needed for some devices
+        let screenAngle = 0;
+        if (window.screen?.orientation?.angle !== undefined) {
+          screenAngle = window.screen.orientation.angle;
+        } else if (window.orientation !== undefined) {
+          // window.orientation: 0=portrait, 90=landscape-left, -90=landscape-right, 180=upside-down
+          screenAngle = window.orientation;
+        }
+        
+        if (screenAngle !== 0) {
+          heading = (heading - screenAngle + 360) % 360;
         }
       }
       
-      if (event.alpha !== null) {
-        // Convert alpha (counter-clockwise) to compass heading (clockwise)
-        let heading = (360 - event.alpha) % 360;
-        
-        // Adjust for screen orientation
-        const screenOrientation = window.screen?.orientation?.angle || 0;
-        heading = (heading - screenOrientation + 360) % 360;
-        
+      if (heading !== null) {
         // Smooth the heading
         let diff = heading - currentHeading;
         if (diff > 180) diff -= 360;
